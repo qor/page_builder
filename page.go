@@ -9,6 +9,10 @@ import (
 	"github.com/qor/widget"
 )
 
+func init() {
+	admin.RegisterViewPath("github.com/qor/page_builder/views")
+}
+
 type Page struct {
 	gorm.Model
 	Title         string

@@ -65,14 +65,16 @@
       </script>
 
       <button class="mdl-button mdl-button--primary" type="button"
-      data-toggle="qor.chooser.sortable"
+      data-toggle="qor.pagebuilder"
       data-select-nohint="true"
+      data-select-hastab="true"
+      data-select-title="{{t "qor_admin.page_builder.containers" "containers"}}"
       data-select-modal="many_sortable"
       {{if .InputId}}data-select-id="#{{.InputId}}"{{end}}
       data-select-listing-url="{{url_for .Meta.Config.RemoteDataResource}}"
+      data-select-listing-title="{{t "qor_admin.page_builder.library" "library"}}"
       data-select-creating-url="{{new_resource_path .Meta.Config.RemoteDataResource}}"
-      data-select-backtolist-title="{{t "qor_admin.bottomsheets.back_to_lists" "back to lists"}}"
-      data-select-default-creating="{{.Meta.Config.DefaultCreating}}"
+      data-select-creating-title="{{t "qor_admin.page_builder.templates" "templates"}}"
       {{if .Meta.Config.PrimaryField}}data-remote-data-primary-key="{{.Meta.Config.PrimaryField}}"{{end}}>
         {{t (printf "qor_admin.form.add_%v" (singular (meta_label .Meta))) (printf "Add %v" (singular (meta_label .Meta)))}}
       </button>
@@ -97,6 +99,3 @@
     <input type="hidden" name="{{.InputName}}" value="">
   </div>
 </div>
-
-{{javascript_tag "sorting-sortable-select-many"}}
-{{stylesheet_tag "sorting-sortable-select-many"}}

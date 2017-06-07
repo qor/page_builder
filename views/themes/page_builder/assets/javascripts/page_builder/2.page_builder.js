@@ -14,7 +14,7 @@
     'use strict';
 
     let $body = $('body'),
-        NAMESPACE = 'qor.chooser.sortable',
+        NAMESPACE = 'qor.pagebuilder',
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
@@ -159,7 +159,7 @@
         },
 
         handleBottomSelect: function() {
-            var $bottomsheets = $(CLASS_BOTTOMSHEETS),
+            let $bottomsheets = $(CLASS_BOTTOMSHEETS),
                 options = {
                     onSelect: this.onSelectResults.bind(this), // render selected item after click item lists
                     onSubmit: this.onSubmitResults.bind(this) // render new items after new item form submitted
@@ -167,6 +167,7 @@
 
             $bottomsheets.qorSelectCore(options).addClass(CLASS_MANY);
             this.initItems();
+            this.initTab();
         },
 
         onSelectResults: function(data) {
@@ -207,9 +208,14 @@
                 primaryKey,
                 $selectedItems = this.$sortableList.find('[data-index]');
 
+            if (!$tr.length) {
+                return;
+            }
+
             $selectedItems.each(function() {
                 selectedIDs.push($(this).data('index'));
             });
+
 
             $tr.each(function() {
                 var $this = $(this),
@@ -220,6 +226,40 @@
                 if (selectedIDs.indexOf(primaryKey) != '-1') {
                     $this.addClass(CLASS_SELECTED);
                     $td.append(selectedIconTmpl);
+                }
+            });
+        },
+
+        initTab: function (){
+            let data = this.$element.data(),
+                $bottomsheets = $(CLASS_BOTTOMSHEETS),
+                $bottomsheetsBody = $bottomsheets.find('.qor-bottomsheets__body');
+
+            $bottomsheets.addClass('has-tab');
+            $bottomsheets.find('.qor-bottomsheets__title').html(data.selectTitle);
+            $bottomsheetsBody.html('');
+            $bottomsheetsBody.append(`<ul class="qor-bottomsheets__tab clearfix"><li class="is-active" data-tab-url="${data.selectCreatingUrl}">${data.selectCreatingTitle}</li><li data-tab-url="${data.selectListingUrl}">${data.selectListingTitle}</li></ul><div class="qor-bottomsheets__tab-content"></div>`);
+
+            $bottomsheets.on(EVENT_CLICK, '.qor-bottomsheets__tab li', this.switchResource.bind(this));
+            $bottomsheets.find('.is-active').click();
+
+        },
+
+        switchResource: function(e) {
+            let $target = $(e.target),
+                url = $target.data('tab-url'),
+                _this = this,
+                $bottomsheets = $(CLASS_BOTTOMSHEETS);
+
+            $bottomsheets.find('.qor-bottomsheets__tab li').removeClass('is-active');
+            $target.addClass('is-active');
+
+            $.ajax(url, {
+                method: 'GET',
+                dataType: 'html',
+                success: function(html) {
+                    $bottomsheets.find('.qor-bottomsheets__tab-content').html($(html).find('.mdl-layout__content.qor-page').html()).trigger('enable');
+                    _this.initItems();
                 }
             });
         },
@@ -261,9 +301,15 @@
         },
 
         destroy: function() {
+            let $element = this.$element;
             this.sortable.destroy();
             this.unbind();
-            this.$element.select2('destroy').removeData(NAMESPACE);
+
+            if ($element.is('select')) {
+                $element.select2('destroy');
+            }
+
+            $element.removeData(NAMESPACE);
         }
     };
 
@@ -295,7 +341,7 @@
     };
 
     $(function() {
-        var selector = '[data-toggle="qor.chooser.sortable"]';
+        var selector = '[data-toggle="qor.pagebuilder"]';
 
         if ($('body').data(IS_LOADED)) {
             return;

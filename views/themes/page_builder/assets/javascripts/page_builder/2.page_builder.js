@@ -27,9 +27,8 @@
         CLASS_SORTABLE_DELETE = '.qor-dragable__list-delete',
         CLASS_SORTABLE_DATA = '.qor-dragable__list-data',
         CLASS_SORTABLE_BUTTON_ADD = '.qor-dragable__button-add',
-        CLASS_BOTTOMSHEETS = '.qor-bottomsheets',
-        IS_LOADED = 'sortable-select-many-loaded',
-        CLASS_MANY = 'qor-bottomsheets__select-many',
+        CLASS_MANY = 'qor-bottomsheets__select-many qor-bottomsheets__pagebuilder',
+        CLASS_SELECT_HINT = '.qor-selectmany__hint',
         CLASS_SELECTED = 'is_selected',
         CLASS_SORTABLE_MANY = '[data-select-modal="many_sortable"]';
 
@@ -103,7 +102,6 @@
                         $(CLASS_CHOSE_INPUT).attr('placeholder', placeholderText);
                     })
                     .on('select2:select', function(e) {
-                        console.log(e.params.data);
                         self.addItems(e.params.data);
                     })
                     .on('select2:unselect', function(e) {
@@ -121,13 +119,15 @@
         },
 
         bind: function() {
-            this.$parent.on(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show.bind(this));
-            $(document).on(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable.bind(this));
+            this.$parent
+                .on(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show.bind(this))
+                .on(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable.bind(this));
         },
 
         unbind: function() {
-            this.$parent.off(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show);
-            $(document).off(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable);
+            this.$parent
+                .off(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show)
+                .off(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable);
         },
 
         openSortable: function(e) {
@@ -158,14 +158,14 @@
 
         },
 
-        handleBottomSelect: function() {
-            let $bottomsheets = $(CLASS_BOTTOMSHEETS),
-                options = {
+        handleBottomSelect: function($bottomsheets) {
+            let options = {
                     onSelect: this.onSelectResults.bind(this), // render selected item after click item lists
                     onSubmit: this.onSubmitResults.bind(this) // render new items after new item form submitted
                 };
 
             $bottomsheets.qorSelectCore(options).addClass(CLASS_MANY);
+            this.$bottomsheets = $bottomsheets;
             this.initItems();
             this.initTab();
         },
@@ -184,10 +184,12 @@
                 $tr.removeClass(CLASS_SELECTED);
                 $td.find('.qor-select__select-icon').remove();
             }
+            this.updateHint(this.getSelectedList());
         },
 
         onSubmitResults: function(data) {
             this.addItems(this.collectData(data), true);
+            this.updateHint(this.getSelectedList());
         },
 
         collectData: function(data) {
@@ -201,12 +203,20 @@
             return obj;
         },
 
+        getSelectedList: function(){
+            return {
+                selectedNum: this.$sortableList.find('[data-index]').length
+            };
+        },
+
         initItems: function() {
-            var $tr = $(CLASS_BOTTOMSHEETS).find('tbody tr'),
+            let $tr = this.$bottomsheets.find('tbody tr'),
                 selectedIconTmpl = this.selectedIconTmpl,
                 selectedIDs = [],
                 primaryKey,
                 $selectedItems = this.$sortableList.find('[data-index]');
+
+            this.updateHint(this.getSelectedList());
 
             if (!$tr.length) {
                 return;
@@ -216,9 +226,8 @@
                 selectedIDs.push($(this).data('index'));
             });
 
-
             $tr.each(function() {
-                var $this = $(this),
+                let $this = $(this),
                     $td = $this.find('td:first');
 
                 primaryKey = $this.data().primaryKey;
@@ -230,15 +239,27 @@
             });
         },
 
+        renderHint: function(data) {
+            return window.Mustache.render($('[name="qor-pagebuilder-hint"]').html(), data);
+        },
+
+        updateHint: function(data) {
+            let $template = this.renderHint(data),
+                $bottomsheets = this.$bottomsheets;
+
+            $bottomsheets.find(CLASS_SELECT_HINT).remove();
+            $bottomsheets.find('.qor-page__body').before($template);
+        },
+
         initTab: function (){
             let data = this.$element.data(),
-                $bottomsheets = $(CLASS_BOTTOMSHEETS),
+                $bottomsheets = this.$bottomsheets,
                 $bottomsheetsBody = $bottomsheets.find('.qor-bottomsheets__body');
 
             $bottomsheets.addClass('has-tab');
             $bottomsheets.find('.qor-bottomsheets__title').html(data.selectTitle);
             $bottomsheetsBody.html('');
-            $bottomsheetsBody.append(`<ul class="qor-bottomsheets__tab clearfix"><li class="is-active" data-tab-url="${data.selectCreatingUrl}">${data.selectCreatingTitle}</li><li data-tab-url="${data.selectListingUrl}">${data.selectListingTitle}</li></ul><div class="qor-bottomsheets__tab-content"></div>`);
+            $bottomsheetsBody.append(`<ul class="qor-bottomsheets__tab clearfix"><li class="is-active" data-tab-type="create" data-tab-url="${data.selectCreatingUrl}">${data.selectCreatingTitle}</li><li data-tab-url="${data.selectListingUrl}" data-tab-type="list">${data.selectListingTitle}</li></ul><div class="qor-bottomsheets__tab-content"></div>`);
 
             $bottomsheets.on(EVENT_CLICK, '.qor-bottomsheets__tab li', this.switchResource.bind(this));
             $bottomsheets.find('.is-active').click();
@@ -249,7 +270,7 @@
             let $target = $(e.target),
                 url = $target.data('tab-url'),
                 _this = this,
-                $bottomsheets = $(CLASS_BOTTOMSHEETS);
+                $bottomsheets = this.$bottomsheets;
 
             $bottomsheets.find('.qor-bottomsheets__tab li').removeClass('is-active');
             $target.addClass('is-active');
@@ -258,6 +279,7 @@
                 method: 'GET',
                 dataType: 'html',
                 success: function(html) {
+                    $bottomsheets.find('.qor-bottomsheets__tab-content').attr('content-type', $target.data('tab-type'));
                     $bottomsheets.find('.qor-bottomsheets__tab-content').html($(html).find('.mdl-layout__content.qor-page').html()).trigger('enable');
                     _this.initItems();
                 }
@@ -296,7 +318,7 @@
             this.renderOption();
 
             if (isNewData) {
-                this.BottomSheets.hide();
+                this.$bottomsheets.find('.qor-widget__cancel').click();
             }
         },
 
@@ -342,12 +364,6 @@
 
     $(function() {
         var selector = '[data-toggle="qor.pagebuilder"]';
-
-        if ($('body').data(IS_LOADED)) {
-            return;
-        }
-
-        $('body').data(IS_LOADED, true);
 
         $(document).
         on(EVENT_DISABLE, function(e) {

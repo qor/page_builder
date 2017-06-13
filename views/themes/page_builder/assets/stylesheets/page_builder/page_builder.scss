@@ -75,7 +75,7 @@ $color-black: "0,0,0";
     }
 }
 
-.qor-bottomsheets.has-tab{
+.qor-bottomsheets__pagebuilder{
     &.is-shown .qor-bottomsheets__body{
         padding: 0;
         .qor-layout__widget-new{
@@ -83,6 +83,8 @@ $color-black: "0,0,0";
         }
         .qor-page__body{
             padding-left: 0;
+            margin-left: 0;
+            padding-top: 32px;
         }
         .qor-page__header{
             margin: 0;
@@ -97,6 +99,15 @@ $color-black: "0,0,0";
             }
         }
     }
+    [content-type="create"]{
+        .qor-pagebuilder-hint{
+            padding:  12px;
+        }
+    }
+    .qor-pagebuilder-hint{
+        width: 610px;
+        padding: 12px 12px 12px 35px;
+    }
     .qor-bottomsheets__search{
         display: none;
     }
@@ -110,7 +121,7 @@ $color-black: "0,0,0";
         text-transform: capitalize;
     }
     .qor-bottomsheets__tab-content{
-        height: calc(100% - 56px);
+        height: calc(100% - 100px);
         padding: 24px 0 32px 16px;
         .qor-page__header{
             display: none;

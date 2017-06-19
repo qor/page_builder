@@ -28,8 +28,6 @@
         CLASS_SORTABLE_DATA = '.qor-dragable__list-data',
         CLASS_SORTABLE_BUTTON_ADD = '.qor-dragable__button-add',
         CLASS_MANY = 'qor-bottomsheets__select-many qor-bottomsheets__pagebuilder',
-        CLASS_SELECT_HINT = '.qor-selectmany__hint',
-        CLASS_SELECTED = 'is_selected',
         CLASS_SORTABLE_MANY = '[data-select-modal="many_sortable"]';
 
     function QorPageBuilder(element, options) {
@@ -134,8 +132,6 @@
             let data = $(e.target).data();
 
             this.BottomSheets = $body.data('qor.bottomsheets');
-            this.selectedIconTmpl = $('[name="select-many-selected-icon"]').html();
-
             data.ingoreSubmit = true;
 
             data.url = data.selectListingUrl;
@@ -166,89 +162,30 @@
 
             $bottomsheets.qorSelectCore(options).addClass(CLASS_MANY);
             this.$bottomsheets = $bottomsheets;
-            this.initItems();
             this.initTab();
         },
 
         onSelectResults: function(data) {
-            let $tr = data.$clickElement,
-                $td = $tr.find('td:first'),
-                obj = this.collectData(data);
-
-            if (!$(CLASS_SORTABLE).find('li[data-index="' + obj.id + '"]').length) {
-                this.addItems(obj);
-                $tr.addClass(CLASS_SELECTED);
-                $td.append(this.selectedIconTmpl);
-            } else {
-                this.removeItems(obj);
-                $tr.removeClass(CLASS_SELECTED);
-                $td.find('.qor-select__select-icon').remove();
-            }
-            this.updateHint(this.getSelectedList());
+            this.addItems(this.collectData(data));
         },
 
         onSubmitResults: function(data) {
             this.addItems(this.collectData(data), true);
-            this.updateHint(this.getSelectedList());
         },
 
         collectData: function(data) {
             // Handle data for sortable
             let remoteDataPrimaryKey = this.$element.data('remote-data-primary-key'),
-                obj = {};
+                obj = $.extend({}, data);
 
-            obj.id = data[remoteDataPrimaryKey] || data.primaryKey || data.Id || data.ID;
-            obj.value = data.Name || data.text || data.Text || data.Title || data.Code || obj.id;
+            obj.SortableID = data[remoteDataPrimaryKey] || data.primaryKey || data.Id || data.ID;
+            obj.SortableValue = data.Name || data.text || data.Text || data.Title || data.Code || obj.SortableID;
 
             return obj;
         },
 
-        getSelectedList: function(){
-            return {
-                selectedNum: this.$sortableList.find('[data-index]').length
-            };
-        },
-
-        initItems: function() {
-            let $tr = this.$bottomsheets.find('tbody tr'),
-                selectedIconTmpl = this.selectedIconTmpl,
-                selectedIDs = [],
-                primaryKey,
-                $selectedItems = this.$sortableList.find('[data-index]');
-
-            this.updateHint(this.getSelectedList());
-
-            if (!$tr.length) {
-                return;
-            }
-
-            $selectedItems.each(function() {
-                selectedIDs.push($(this).data('index'));
-            });
-
-            $tr.each(function() {
-                let $this = $(this),
-                    $td = $this.find('td:first');
-
-                primaryKey = $this.data().primaryKey;
-
-                if (selectedIDs.indexOf(primaryKey) != '-1') {
-                    $this.addClass(CLASS_SELECTED);
-                    $td.append(selectedIconTmpl);
-                }
-            });
-        },
-
         renderHint: function(data) {
             return window.Mustache.render($('[name="qor-pagebuilder-hint"]').html(), data);
-        },
-
-        updateHint: function(data) {
-            let $template = this.renderHint(data),
-                $bottomsheets = this.$bottomsheets;
-
-            $bottomsheets.find(CLASS_SELECT_HINT).remove();
-            $bottomsheets.find('.qor-page__body').before($template);
         },
 
         initTab: function (){
@@ -269,7 +206,6 @@
         switchResource: function(e) {
             let $target = $(e.target),
                 url = $target.data('tab-url'),
-                _this = this,
                 $bottomsheets = this.$bottomsheets;
 
             $bottomsheets.find('.qor-bottomsheets__tab li').removeClass('is-active');
@@ -281,7 +217,6 @@
                 success: function(html) {
                     $bottomsheets.find('.qor-bottomsheets__tab-content').attr('content-type', $target.data('tab-type'));
                     $bottomsheets.find('.qor-bottomsheets__tab-content').html($(html).find('.mdl-layout__content.qor-page').html()).trigger('enable');
-                    _this.initItems();
                 }
             });
         },
@@ -305,7 +240,7 @@
 
         removeItems: function(data) {
 
-            $(CLASS_SORTABLE).find('li[data-index="' + data.id + '"]').remove();
+            this.$parent.find(CLASS_SORTABLE).find('li[data-index="' + data.id + '"]').remove();
             this.renderOption();
         },
 
@@ -320,6 +255,8 @@
             if (isNewData) {
                 this.$bottomsheets.find('.qor-widget__cancel').click();
             }
+
+            this.$bottomsheets.remove();
         },
 
         destroy: function() {
@@ -337,7 +274,11 @@
 
     QorPageBuilder.DEFAULTS = {};
 
-    QorPageBuilder.LIST_HTML = '<li data-index="[[id]]" data-value="[[value]]"><span>[[value]]</span><div><i class="material-icons qor-dragable__list-delete">clear</i><i class="material-icons qor-dragable__list-handle">drag_handle</i></div></li>';
+    QorPageBuilder.LIST_HTML = `<li data-index="[[SortableID]]" data-value="[[SortableValue]]">
+                                    [[#PreviewIcon]][[&PreviewIcon]][[/PreviewIcon]]
+                                    <span>[[SortableValue]]</span>
+                                    <div><i class="material-icons qor-dragable__list-delete">clear</i><i class="material-icons qor-dragable__list-handle">drag_handle</i></div>
+                                </li>`;
 
     QorPageBuilder.OPTION_HTML = '<option selected value="[[value]]"></option>';
 

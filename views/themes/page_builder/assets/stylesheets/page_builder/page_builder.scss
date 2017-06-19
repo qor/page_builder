@@ -39,6 +39,13 @@ $color-black: "0,0,0";
             > span{
                 width: calc(100% - 100px);
             }
+            > img{
+                width: 72px;
+                margin-right: 12px;
+                & + span{
+                    width: calc(100% - 187px);
+                }
+            }
             &:hover{
                 background-color: unquote("rgba(#{$color-black}, 0.06)");
             }
@@ -84,7 +91,6 @@ $color-black: "0,0,0";
         .qor-page__body{
             padding-left: 0;
             margin-left: 0;
-            padding-top: 32px;
         }
         .qor-page__header{
             margin: 0;

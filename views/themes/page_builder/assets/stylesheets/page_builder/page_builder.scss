@@ -110,6 +110,23 @@ $color-black: "0,0,0";
             padding:  12px;
         }
     }
+
+    [data-section-title="Settings"]{
+        label.qor-form-section-title{
+            display: none;
+        }
+        .qor-fieldset{
+            border:  0;
+            padding: 0 16px 0 0;
+            .qor-fieldset{
+                padding: 4px 8px;
+                border: 1px solid rgba(0,0,0,.12);
+            }
+        }
+    }
+    .qor-layout__widget-actions{
+        padding-right: 16px;
+    }
     .qor-pagebuilder-hint{
         width: 610px;
         padding: 12px 12px 12px 35px;

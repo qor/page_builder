@@ -9,6 +9,7 @@ import (
 	"github.com/qor/admin"
 	"github.com/qor/qor/resource"
 	"github.com/qor/slug"
+	"github.com/qor/widget"
 )
 
 func init() {
@@ -64,4 +65,24 @@ func (containers Containers) Value() (driver.Value, error) {
 	}
 
 	return json.Marshal(containers)
+}
+
+func (page Page) ContainerRecords(db *gorm.DB) (records []widget.QorWidgetSetting) {
+	names := []string{}
+	for _, container := range page.Containers {
+		names = append(names, container.Name)
+	}
+
+	containers := []widget.QorWidgetSetting{}
+	db.Where("name in (?)", names).Find(&containers)
+
+	for _, name := range names {
+		for _, container := range containers {
+			if container.Name == name {
+				records = append(records, container)
+			}
+		}
+	}
+
+	return
 }

@@ -249,6 +249,10 @@
         },
 
         addItems: function(data, isNewData) {
+            if (!data.PreviewIcon) {
+                data.PreviewIcon = data.$clickElement.find('.qor-preview-icon').parent().html();
+            }
+
             this.$sortableList.append(this.renderItem(data));
             this.renderOption();
 

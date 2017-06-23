@@ -7,13 +7,11 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
+	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
 	"github.com/qor/slug"
+	"github.com/qor/widget"
 )
-
-func init() {
-	admin.RegisterViewPath("github.com/qor/page_builder/views")
-}
 
 type Page struct {
 	gorm.Model
@@ -64,4 +62,64 @@ func (containers Containers) Value() (driver.Value, error) {
 	}
 
 	return json.Marshal(containers)
+}
+
+func (page Page) GetContainerRecords(db *gorm.DB) (records []widget.QorWidgetSetting) {
+	names := []string{}
+	for _, container := range page.Containers {
+		names = append(names, container.Name)
+	}
+
+	containers := []widget.QorWidgetSetting{}
+	db.Where("name in (?)", names).Find(&containers)
+
+	for _, name := range names {
+		for _, container := range containers {
+			if container.Name == name {
+				records = append(records, container)
+			}
+		}
+	}
+
+	return
+}
+
+type Config struct {
+	Admin       *admin.Admin
+	PageModel   interface{}
+	Containers  *widget.Widgets
+	AdminConfig *admin.Config
+}
+
+func New(config *Config) *admin.Resource {
+	resource := config.Admin.AddResource(config.PageModel, config.AdminConfig)
+
+	resource.Meta(&admin.Meta{
+		Name: "Containers",
+		Valuer: func(value interface{}, context *qor.Context) interface{} {
+			nameWithIcons := [][]string{}
+			if page, ok := value.(interface {
+				GetContainerRecords(*gorm.DB) []widget.QorWidgetSetting
+			}); ok {
+				for _, container := range page.GetContainerRecords(context.GetDB()) {
+					nameWithIcon := []string{container.Name}
+
+					icon := widget.GetWidget(container.WidgetType).PreviewIcon
+					nameWithIcon = append(nameWithIcon, icon)
+
+					nameWithIcons = append(nameWithIcons, nameWithIcon)
+				}
+			}
+
+			return nameWithIcons
+		},
+		Config: &admin.SelectManyConfig{
+			SelectionTemplate:  "metas/form/sortable_widgets.tmpl",
+			SelectMode:         "bottom_sheet",
+			DefaultCreating:    true,
+			RemoteDataResource: config.Containers.WidgetSettingResource,
+		}})
+
+	admin.RegisterViewPath("github.com/qor/page_builder/views")
+	return resource
 }

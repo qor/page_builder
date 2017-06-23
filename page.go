@@ -71,7 +71,7 @@ func (page Page) GetContainerRecords(db *gorm.DB) (records []widget.QorWidgetSet
 	}
 
 	containers := []widget.QorWidgetSetting{}
-	db.Where("name in (?)", names).Find(&containers)
+	db.Where("name in (?) AND scope = ?", names, "default").Find(&containers)
 
 	for _, name := range names {
 		for _, container := range containers {

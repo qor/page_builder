@@ -28,8 +28,10 @@
     <ul class="qor-dragable__list">
       {{if .Meta.Config.RemoteDataResource}}
         {{range $value := $current_values}}
-          <li data-index="{{primary_key_of $value}}" data-value="{{stringify $value}}">
-            <span>{{stringify $value}}</span>
+          {{$name := index $value 0}}
+          <li data-index="{{primary_key_of $name}}" data-value="{{stringify $name}}">
+            <img class="qor-preview-icon" src="{{index $value 1}}">
+            <span>{{stringify $name}}</span>
             <div>
               <i class="material-icons qor-dragable__list-delete">clear</i>
               <i class="material-icons qor-dragable__list-handle">drag_handle</i>
@@ -55,7 +57,9 @@
 
     <select class="hidden qor-dragable__list-data" id="{{.InputName}}" name="{{.InputName}}" multiple>
       {{range $value := $current_values}}
-        <option value="{{primary_key_of $value}}" data-index="{{primary_key_of $value}}" data-value="{{stringify $value}}" selected>{{stringify $value}}</option>
+        {{$name := index $value 0}}
+        <option value="{{primary_key_of $name}}" data-index="{{primary_key_of $name}}" data-value="{{stringify $name}}" selected>{{stringify $name}}</option>
+        }
       {{end}}
     </select>
 

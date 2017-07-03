@@ -18,6 +18,7 @@
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
+        EVENT_SELECTCORE = 'afterSelected.qor.selectcore afterSubmitted.qor.selectcore',
         CLASS_CHOSE = '.select2-selection__choice',
         CLASS_CHOSE_CONTAINER = '.select2-container',
         CLASS_CHOSE_INPUT = '.select2-search__field',
@@ -120,12 +121,15 @@
             this.$parent
                 .on(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show.bind(this))
                 .on(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable.bind(this));
+
+            $(document).on(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
         },
 
         unbind: function() {
             this.$parent
                 .off(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show)
                 .off(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable);
+            $(document).off(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
         },
 
         openSortable: function(e) {
@@ -152,6 +156,10 @@
                 $container.find(CLASS_CHOSE_INPUT).click();
             }, 100);
 
+        },
+
+        handleBottomSelectData: function(){
+            this.BottomSheets.resourseData.ingoreSubmit = true;
         },
 
         handleBottomSelect: function($bottomsheets) {
@@ -260,6 +268,7 @@
                 this.$bottomsheets.find('.qor-widget__cancel').click();
             }
 
+            $(document).off(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
             this.$bottomsheets.remove();
         },
 

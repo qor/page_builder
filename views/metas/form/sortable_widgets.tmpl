@@ -27,11 +27,12 @@
   <div class="qor-field__edit qor-field__block qor-dragable">
     <ul class="qor-dragable__list">
       {{if .Meta.Config.RemoteDataResource}}
+        {{$listurl := url_for .Meta.Config.RemoteDataResource}}
         {{range $value := $current_values}}
           {{$name := index $value 0}}
           <li data-index="{{primary_key_of $name}}" data-value="{{stringify $name}}">
             <img class="qor-preview-icon" src="{{index $value 1}}">
-            <span>{{stringify $name}}</span>
+            <span><a href="{{$listurl}}/{{stringify $name}}" data-ajax-mute="true" data-bottomsheet-classname="qor_pagebuilder--edit_widget" data-url="{{$listurl}}/{{stringify $name}}">{{stringify $name}}</a></span>
             <div>
               <i class="material-icons qor-dragable__list-delete">clear</i>
               <i class="material-icons qor-dragable__list-handle">drag_handle</i>
@@ -69,18 +70,18 @@
       </script>
 
       <button class="mdl-button mdl-button--primary" type="button"
-      data-toggle="qor.pagebuilder"
-      data-select-nohint="true"
-      data-select-hastab="true"
-      data-select-title="{{t "qor_admin.page_builder.containers" "containers"}}"
-      data-select-modal="many_sortable"
-      {{if .InputId}}data-select-id="#{{.InputId}}"{{end}}
-      data-select-listing-url="{{url_for .Meta.Config.RemoteDataResource}}"
-      data-select-listing-title="{{t "qor_admin.page_builder.library" "library"}}"
-      data-select-creating-url="{{new_resource_path .Meta.Config.RemoteDataResource}}"
-      data-select-creating-title="{{t "qor_admin.page_builder.templates" "templates"}}"
-      {{if .Meta.Config.PrimaryField}}data-remote-data-primary-key="{{.Meta.Config.PrimaryField}}"{{end}}>
-        {{t (printf "qor_admin.form.add_%v" (singular (meta_label .Meta))) (printf "Add %v" (singular (meta_label .Meta)))}}
+        data-toggle="qor.pagebuilder"
+        data-select-nohint="true"
+        data-select-hastab="true"
+        data-select-title="{{t "qor_admin.page_builder.containers" "containers"}}"
+        data-select-modal="many_sortable"
+        {{if .InputId}}data-select-id="#{{.InputId}}"{{end}}
+        data-select-listing-url="{{url_for .Meta.Config.RemoteDataResource}}"
+        data-select-listing-title="{{t "qor_admin.page_builder.library" "library"}}"
+        data-select-creating-url="{{new_resource_path .Meta.Config.RemoteDataResource}}"
+        data-select-creating-title="{{t "qor_admin.page_builder.templates" "templates"}}"
+        {{if .Meta.Config.PrimaryField}}data-remote-data-primary-key="{{.Meta.Config.PrimaryField}}"{{end}}>
+          {{t (printf "qor_admin.form.add_%v" (singular (meta_label .Meta))) (printf "Add %v" (singular (meta_label .Meta)))}}
       </button>
     {{else}}
       <button class="mdl-button mdl-button--primary qor-dragable__button-add" type="button">

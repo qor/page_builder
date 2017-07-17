@@ -136,6 +136,7 @@
             let data = $(e.target).data();
 
             this.BottomSheets = $body.data('qor.bottomsheets');
+            this.selectListingUrl = data.selectListingUrl;
             data.ingoreSubmit = true;
 
             data.url = data.selectListingUrl;
@@ -261,6 +262,8 @@
                 data.PreviewIcon = data.$clickElement.find('.qor-preview-icon').parent().html();
             }
 
+            data.EditUrl = `${this.selectListingUrl}/${data.SortableID}`;
+
             this.$sortableList.append(this.renderItem(data));
             this.renderOption();
 
@@ -289,7 +292,7 @@
 
     QorPageBuilder.LIST_HTML = `<li data-index="[[SortableID]]" data-value="[[SortableValue]]">
                                     [[#PreviewIcon]][[&PreviewIcon]][[/PreviewIcon]]
-                                    <span>[[SortableValue]]</span>
+                                    <span><a href="[[EditUrl]]" data-url="[[EditUrl]]" data-ajax-mute="true" data-bottomsheet-classname="qor_pagebuilder--edit_widget">[[SortableValue]]</a></span>
                                     <div><i class="material-icons qor-dragable__list-delete">clear</i><i class="material-icons qor-dragable__list-handle">drag_handle</i></div>
                                 </li>`;
 

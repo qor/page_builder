@@ -82,6 +82,21 @@ $color-black: "0,0,0";
     }
 }
 
+.qor_pagebuilder--edit_widget{
+    &.qor-bottomsheets.is-shown .qor-bottomsheets__body.has-header{
+        padding: 12px 0 12px 42px;
+    }
+    .select2-container{
+        max-width: 100%;
+    }
+    .qor-form-container{
+        padding-right: 24px;
+    }
+    .qor-page__header{
+        display: none !important;
+    }
+}
+
 .qor-bottomsheets__pagebuilder{
     &.is-shown .qor-bottomsheets__body{
         padding: 0;

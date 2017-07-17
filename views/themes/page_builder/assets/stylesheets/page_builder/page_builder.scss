@@ -39,6 +39,9 @@ $color-black: "0,0,0";
             > span{
                 width: calc(100% - 100px);
             }
+            a{
+                text-decoration: none;
+            }
             > img{
                 width: 72px;
                 margin-right: 12px;
@@ -84,13 +87,13 @@ $color-black: "0,0,0";
 
 .qor_pagebuilder--edit_widget{
     &.qor-bottomsheets.is-shown .qor-bottomsheets__body.has-header{
-        padding: 12px 0 12px 42px;
+        padding: 12px 0 12px 42px !important;
     }
     .select2-container{
         max-width: 100%;
     }
     .qor-form-container{
-        padding-right: 24px;
+        padding-right: 24px !important;
     }
     .qor-page__header{
         display: none !important;
@@ -99,7 +102,7 @@ $color-black: "0,0,0";
 
 .qor-bottomsheets__pagebuilder{
     &.is-shown .qor-bottomsheets__body{
-        padding: 0;
+        padding: 0 !important;
         .qor-layout__widget-new{
             padding: 0;
         }
@@ -162,7 +165,7 @@ $color-black: "0,0,0";
         height: calc(100% - 100px);
         padding: 24px 0 32px 16px;
         .qor-page__header{
-            display: none;
+            display: none !important;
         }
     }
     .qor-bottomsheets__tab{

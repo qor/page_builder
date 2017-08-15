@@ -10,7 +10,6 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
 
     let $body = $('body'),
@@ -91,9 +90,8 @@
             }
 
             if ($this.is('select')) {
-
-                $this.on('change', function() {
-
+                $this
+                    .on('change', function() {
                         setTimeout(function() {
                             $parent.find(CLASS_CHOSE).hide();
                         }, 1);
@@ -118,17 +116,13 @@
         },
 
         bind: function() {
-            this.$parent
-                .on(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show.bind(this))
-                .on(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable.bind(this));
+            this.$parent.on(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show.bind(this)).on(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable.bind(this));
 
             $(document).on(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
         },
 
         unbind: function() {
-            this.$parent
-                .off(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show)
-                .off(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable);
+            this.$parent.off(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show).off(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable);
             $(document).off(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
         },
 
@@ -156,18 +150,19 @@
             setTimeout(function() {
                 $container.find(CLASS_CHOSE_INPUT).click();
             }, 100);
-
         },
 
-        handleBottomSelectData: function(){
-            this.BottomSheets.resourseData.ingoreSubmit = true;
+        handleBottomSelectData: function() {
+            if ($('.qor-bottomsheets__pagebuilder').length) {
+                this.BottomSheets.resourseData.ingoreSubmit = true;
+            }
         },
 
         handleBottomSelect: function($bottomsheets) {
             let options = {
-                    onSelect: this.onSelectResults.bind(this), // render selected item after click item lists
-                    onSubmit: this.onSubmitResults.bind(this) // render new items after new item form submitted
-                };
+                onSelect: this.onSelectResults.bind(this), // render selected item after click item lists
+                onSubmit: this.onSubmitResults.bind(this) // render new items after new item form submitted
+            };
 
             $bottomsheets.qorSelectCore(options).addClass(CLASS_MANY);
             this.$bottomsheets = $bottomsheets;
@@ -197,7 +192,7 @@
             return window.Mustache.render($('[name="qor-pagebuilder-hint"]').html(), data);
         },
 
-        initTab: function (){
+        initTab: function() {
             let data = this.$element.data(),
                 $bottomsheets = this.$bottomsheets,
                 $bottomsheetsBody = $bottomsheets.find('.qor-bottomsheets__body');
@@ -205,11 +200,12 @@
             $bottomsheets.addClass('has-tab');
             $bottomsheets.find('.qor-bottomsheets__title').html(data.selectTitle);
             $bottomsheetsBody.html('');
-            $bottomsheetsBody.append(`<ul class="qor-bottomsheets__tab clearfix"><li class="is-active" data-tab-type="create" data-tab-url="${data.selectCreatingUrl}">${data.selectCreatingTitle}</li><li data-tab-url="${data.selectListingUrl}" data-tab-type="list">${data.selectListingTitle}</li></ul><div class="qor-bottomsheets__tab-content"></div>`);
+            $bottomsheetsBody.append(
+                `<ul class="qor-bottomsheets__tab clearfix"><li class="is-active" data-tab-type="create" data-tab-url="${data.selectCreatingUrl}">${data.selectCreatingTitle}</li><li data-tab-url="${data.selectListingUrl}" data-tab-type="list">${data.selectListingTitle}</li></ul><div class="qor-bottomsheets__tab-content"></div>`
+            );
 
             $bottomsheets.on(EVENT_CLICK, '.qor-bottomsheets__tab li', this.switchResource.bind(this));
             $bottomsheets.find('.is-active').click();
-
         },
 
         switchResource: function(e) {
@@ -241,14 +237,15 @@
             $selector.empty();
 
             window._.each(indexArr, function(id) {
-                $selector.append(window.Mustache.render(QorPageBuilder.OPTION_HTML, ({
-                    'value': id
-                })));
+                $selector.append(
+                    window.Mustache.render(QorPageBuilder.OPTION_HTML, {
+                        value: id
+                    })
+                );
             });
         },
 
         removeItems: function(data) {
-
             this.$parent.find(CLASS_SORTABLE).find('li[data-index="' + data.id + '"]').remove();
             this.renderOption();
         },
@@ -305,7 +302,6 @@
             var fn;
 
             if (!data) {
-
                 if (/destroy/.test(options)) {
                     return;
                 }
@@ -313,7 +309,7 @@
                 $this.data(NAMESPACE, (data = new QorPageBuilder(this, options)));
             }
 
-            if (typeof options === 'string' && $.isFunction(fn = data[options])) {
+            if (typeof options === 'string' && $.isFunction((fn = data[options]))) {
                 fn.apply(data);
             }
         });
@@ -322,16 +318,15 @@
     $(function() {
         var selector = '[data-toggle="qor.pagebuilder"]';
 
-        $(document).
-        on(EVENT_DISABLE, function(e) {
-            QorPageBuilder.plugin.call($(selector, e.target), 'destroy');
-        }).
-        on(EVENT_ENABLE, function(e) {
-            QorPageBuilder.plugin.call($(selector, e.target));
-        }).
-        triggerHandler(EVENT_ENABLE);
+        $(document)
+            .on(EVENT_DISABLE, function(e) {
+                QorPageBuilder.plugin.call($(selector, e.target), 'destroy');
+            })
+            .on(EVENT_ENABLE, function(e) {
+                QorPageBuilder.plugin.call($(selector, e.target));
+            })
+            .triggerHandler(EVENT_ENABLE);
     });
 
     return QorPageBuilder;
-
 });

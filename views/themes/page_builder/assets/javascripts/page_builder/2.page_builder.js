@@ -270,6 +270,9 @@
 
             $(document).off(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
             this.$bottomsheets.remove();
+            if (!$('.qor-bottomsheets').is(':visible')) {
+                $('body').removeClass('qor-bottomsheets-open');
+            }
         },
 
         destroy: function() {

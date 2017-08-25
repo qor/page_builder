@@ -116,13 +116,17 @@
         },
 
         bind: function() {
-            this.$parent.on(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show.bind(this)).on(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable.bind(this));
+            this.$parent
+                .on(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show.bind(this))
+                .on(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable.bind(this));
 
             $(document).on(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
         },
 
         unbind: function() {
-            this.$parent.off(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show).off(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable);
+            this.$parent
+                .off(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show)
+                .off(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable);
             $(document).off(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
         },
 
@@ -154,7 +158,11 @@
 
         handleBottomSelectData: function() {
             if ($('.qor-bottomsheets__pagebuilder').length) {
-                this.BottomSheets.resourseData.ingoreSubmit = true;
+                if (this.BottomSheets) {
+                    this.BottomSheets.resourseData.ingoreSubmit = true;
+                } else {
+                    $body.data('qor.bottomsheets').resourseData.ingoreSubmit = true;
+                }
             }
         },
 
@@ -201,7 +209,11 @@
             $bottomsheets.find('.qor-bottomsheets__title').html(data.selectTitle);
             $bottomsheetsBody.html('');
             $bottomsheetsBody.append(
-                `<ul class="qor-bottomsheets__tab clearfix"><li class="is-active" data-tab-type="create" data-tab-url="${data.selectCreatingUrl}">${data.selectCreatingTitle}</li><li data-tab-url="${data.selectListingUrl}" data-tab-type="list">${data.selectListingTitle}</li></ul><div class="qor-bottomsheets__tab-content"></div>`
+                `<ul class="qor-bottomsheets__tab clearfix">
+                    <li class="is-active" data-tab-type="create" data-tab-url="${data.selectCreatingUrl}">${data.selectCreatingTitle}</li>
+                    <li data-tab-url="${data.selectListingUrl}" data-tab-type="list">${data.selectListingTitle}</li>
+                </ul>
+                <div class="qor-bottomsheets__tab-content"></div>`
             );
 
             $bottomsheets.on(EVENT_CLICK, '.qor-bottomsheets__tab li', this.switchResource.bind(this));
@@ -221,7 +233,10 @@
                 dataType: 'html',
                 success: function(html) {
                     $bottomsheets.find('.qor-bottomsheets__tab-content').attr('content-type', $target.data('tab-type'));
-                    $bottomsheets.find('.qor-bottomsheets__tab-content').html($(html).find('.mdl-layout__content.qor-page').html()).trigger('enable');
+                    $bottomsheets
+                        .find('.qor-bottomsheets__tab-content')
+                        .html($(html).find('.mdl-layout__content.qor-page').html())
+                        .trigger('enable');
                 }
             });
         },

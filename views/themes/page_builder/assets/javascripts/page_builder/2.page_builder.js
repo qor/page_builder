@@ -17,7 +17,6 @@
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
-        EVENT_SELECTCORE = 'afterSelected.qor.selectcore afterSubmitted.qor.selectcore',
         CLASS_CHOSE = '.select2-selection__choice',
         CLASS_CHOSE_CONTAINER = '.select2-container',
         CLASS_CHOSE_INPUT = '.select2-search__field',
@@ -116,18 +115,11 @@
         },
 
         bind: function() {
-            this.$parent
-                .on(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show.bind(this))
-                .on(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable.bind(this));
-
-            $(document).on(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
+            this.$parent.on(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show.bind(this)).on(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable.bind(this));
         },
 
         unbind: function() {
-            this.$parent
-                .off(EVENT_CLICK, CLASS_SORTABLE_BUTTON_ADD, this.show)
-                .off(EVENT_CLICK, CLASS_SORTABLE_MANY, this.openSortable);
-            $(document).off(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
+            this.$parent.off(EVENT_CLICK);
         },
 
         openSortable: function(e) {
@@ -154,16 +146,6 @@
             setTimeout(function() {
                 $container.find(CLASS_CHOSE_INPUT).click();
             }, 100);
-        },
-
-        handleBottomSelectData: function() {
-            if ($('.qor-bottomsheets__pagebuilder').length) {
-                if (this.BottomSheets) {
-                    this.BottomSheets.resourseData.ingoreSubmit = true;
-                } else {
-                    $body.data('qor.bottomsheets').resourseData.ingoreSubmit = true;
-                }
-            }
         },
 
         handleBottomSelect: function($bottomsheets) {
@@ -235,7 +217,11 @@
                     $bottomsheets.find('.qor-bottomsheets__tab-content').attr('content-type', $target.data('tab-type'));
                     $bottomsheets
                         .find('.qor-bottomsheets__tab-content')
-                        .html($(html).find('.mdl-layout__content.qor-page').html())
+                        .html(
+                            $(html)
+                                .find('.mdl-layout__content.qor-page')
+                                .html()
+                        )
                         .trigger('enable');
                 }
             });
@@ -261,7 +247,10 @@
         },
 
         removeItems: function(data) {
-            this.$parent.find(CLASS_SORTABLE).find('li[data-index="' + data.id + '"]').remove();
+            this.$parent
+                .find(CLASS_SORTABLE)
+                .find('li[data-index="' + data.id + '"]')
+                .remove();
             this.renderOption();
         },
 
@@ -271,7 +260,10 @@
 
         addItems: function(data, isNewData) {
             if (!data.PreviewIcon) {
-                data.PreviewIcon = data.$clickElement.find('.qor-preview-icon').parent().html();
+                data.PreviewIcon = data.$clickElement
+                    .find('.qor-preview-icon')
+                    .parent()
+                    .html();
             }
 
             data.EditUrl = `${this.selectListingUrl}/${data.SortableID}`;
@@ -283,7 +275,6 @@
                 this.$bottomsheets.find('.qor-widget__cancel').click();
             }
 
-            $(document).off(EVENT_SELECTCORE, this.handleBottomSelectData.bind(this));
             this.$bottomsheets.remove();
             if (!$('.qor-bottomsheets').is(':visible')) {
                 $('body').removeClass('qor-bottomsheets-open');
@@ -307,7 +298,8 @@
 
     QorPageBuilder.LIST_HTML = `<li data-index="[[SortableID]]" data-value="[[SortableValue]]">
                                     [[#PreviewIcon]][[&PreviewIcon]][[/PreviewIcon]]
-                                    <span><a href="[[EditUrl]]" data-url="[[EditUrl]]" data-ajax-mute="true" data-bottomsheet-classname="qor_pagebuilder--edit_widget">[[SortableValue]]</a></span>
+                                    <span>
+                                        <a href="[[EditUrl]]" data-url="[[EditUrl]]" data-ajax-mute="true" data-bottomsheet-classname="qor_pagebuilder--edit_widget">[[SortableValue]]</a></span>
                                     <div><i class="material-icons qor-dragable__list-delete">clear</i><i class="material-icons qor-dragable__list-handle">drag_handle</i></div>
                                 </li>`;
 

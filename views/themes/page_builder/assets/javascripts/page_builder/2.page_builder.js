@@ -27,7 +27,7 @@
         CLASS_SORTABLE_DATA = '.qor-dragable__list-data',
         CLASS_SORTABLE_BUTTON_ADD = '.qor-dragable__button-add',
         CLASS_MANY = 'qor-bottomsheets__select-many qor-bottomsheets__pagebuilder',
-        CLASS_SORTABLE_MANY = '[data-select-modal="many_sortable"]';
+        CLASS_SORTABLE_MANY = '[data-select-modal="pagebuilder_many_sortable"]';
 
     function QorPageBuilder(element, options) {
         this.$element = $(element);
